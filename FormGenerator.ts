@@ -19,7 +19,7 @@ export class FormGenerator {
   generateForm(currentPage: number): string {
     this.currentPage = currentPage;
     const styles = this.config.styles;
-    let formHTML = `<form id="${this.config.formId}" method="${this.config.method}" action="${this.config.action}" style="${styles?.form ?? ''}">\n`;
+    let formHTML = `<form id="${this.config.formId}" method="${this.config.method}" action="${this.config.action}" style="${styles?.form ?? ''}" onsubmit="return false;">\n`;
 
     this.config.fields.forEach(field => {
       if (field.section === `page${this.currentPage}`) {
@@ -75,7 +75,7 @@ export class FormGenerator {
   }
 
   createSelectField(field: FieldConfig, fieldStyle: string, labelStyle: string, inputStyle: string): string {
-    let fieldHTML = `<div style="${fieldStyle}">\n<label style="${labelStyle}">${field.label}</label>\n<select name="${field.name}" style="${inputStyle}">\n`;
+    let fieldHTML = `<div style="${fieldStyle}">\n<label style="${labelStyle}">${field.label}</label>\n<select name="${field.name}" style="${inputStyle}" ${field.required ? 'required' : ''}>\n`;
 
     field.options?.forEach(option => {
       fieldHTML += `<option value="${option.value}">${option.label}</option>\n`;
@@ -93,10 +93,22 @@ export class FormGenerator {
     }
 
     if (this.currentPage < this.totalPages) {
-      buttonsHTML += `<button type="button" onclick="navigateTo(${this.currentPage + 1})">Próximo</button>`;
+      buttonsHTML += `<button type="button" onclick="validateAndNavigate(${this.currentPage + 1})">Próximo</button>`;
     }
 
     buttonsHTML += '</div>';
     return buttonsHTML;
+  }
+
+  static validatePage(page: number, formConfig: FormConfig): boolean {
+    const fields = formConfig.fields.filter(field => field.section === `page${page}` && field.required);
+    for (const field of fields) {
+      const element = document.querySelector(`[name="${field.name}"]`) as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
+      if (element && !element.value) {
+        alert(`Por favor, preencha o campo obrigatório: ${field.label}`);
+        return false;
+      }
+    }
+    return true;
   }
 }

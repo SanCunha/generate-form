@@ -14,6 +14,25 @@
         document.getElementById('formContainer').innerHTML = generateForm(currentPage);
       }
 
+      function validateAndNavigate(page) {
+        const isValid = validatePage(currentPage);
+        if (isValid) {
+          navigateTo(page);
+        }
+      }
+
+      function validatePage(page) {
+        const fields = [{"type":"text","name":"username","label":"Nome de Usuário","required":true,"pattern":"^[a-zA-Z0-9_]{1,15}$","section":"page1","style":"input-style"},{"type":"password","name":"password","label":"Senha","required":true,"minlength":6,"section":"page1","style":"input-style"},{"type":"email","name":"email","label":"Email","required":true,"section":"page2","style":"input-style"},{"type":"number","name":"age","label":"Idade","required":true,"min":18,"max":100,"section":"page2","style":"input-style"},{"type":"textarea","name":"bio","label":"Biografia","required":true,"minlength":10,"maxlength":500,"section":"page3","style":"input-style"},{"type":"select","name":"gender","label":"Gênero","options":[{"value":"male","label":"Masculino"},{"value":"female","label":"Feminino"},{"value":"other","label":"Outro"}],"required":true,"section":"page3","style":"input-style"},{"type":"submit","value":"Enviar","section":"page3","style":"input-style"}].filter(field => field.section === `page${page}` && field.required);
+        for (const field of fields) {
+          const element = document.querySelector(`[name="${field.name}"]`);
+          if (element && !element.value) {
+            alert(`Por favor, preencha o campo obrigatório: ${field.label}`);
+            return false;
+          }
+        }
+        return true;
+      }
+
       function generateForm(page) {
         const formGenerator = new (class FormGenerator {
     constructor(config) {
@@ -29,7 +48,7 @@
         var _a;
         this.currentPage = currentPage;
         const styles = this.config.styles;
-        let formHTML = `<form id="${this.config.formId}" method="${this.config.method}" action="${this.config.action}" style="${(_a = styles === null || styles === void 0 ? void 0 : styles.form) !== null && _a !== void 0 ? _a : ''}">\n`;
+        let formHTML = `<form id="${this.config.formId}" method="${this.config.method}" action="${this.config.action}" style="${(_a = styles === null || styles === void 0 ? void 0 : styles.form) !== null && _a !== void 0 ? _a : ''}" onsubmit="return false;">\n`;
         this.config.fields.forEach(field => {
             if (field.section === `page${this.currentPage}`) {
                 formHTML += this.createField(field, styles);
@@ -78,7 +97,7 @@
     }
     createSelectField(field, fieldStyle, labelStyle, inputStyle) {
         var _a;
-        let fieldHTML = `<div style="${fieldStyle}">\n<label style="${labelStyle}">${field.label}</label>\n<select name="${field.name}" style="${inputStyle}">\n`;
+        let fieldHTML = `<div style="${fieldStyle}">\n<label style="${labelStyle}">${field.label}</label>\n<select name="${field.name}" style="${inputStyle}" ${field.required ? 'required' : ''}>\n`;
         (_a = field.options) === null || _a === void 0 ? void 0 : _a.forEach(option => {
             fieldHTML += `<option value="${option.value}">${option.label}</option>\n`;
         });
@@ -91,19 +110,30 @@
             buttonsHTML += `<button type="button" onclick="navigateTo(${this.currentPage - 1})">Anterior</button>`;
         }
         if (this.currentPage < this.totalPages) {
-            buttonsHTML += `<button type="button" onclick="navigateTo(${this.currentPage + 1})">Próximo</button>`;
+            buttonsHTML += `<button type="button" onclick="validateAndNavigate(${this.currentPage + 1})">Próximo</button>`;
         }
         buttonsHTML += '</div>';
         return buttonsHTML;
     }
-})({"formId":"meuFormulario","method":"POST","action":"/submit","styles":{"form":"border: 1px solid #ccc; padding: 20px;","field":"margin-bottom: 10px;","label":"font-weight: bold;","input":"padding: 5px; width: 100%;"},"fields":[{"type":"text","name":"username","label":"Nome de Usuário","required":true,"pattern":"^[a-zA-Z0-9_]{1,15}$","section":"page1","style":"input-style"},{"type":"password","name":"password","label":"Senha","required":true,"minlength":6,"section":"page1","style":"input-style"},{"type":"email","name":"email","label":"Email","required":true,"section":"page2","style":"input-style"},{"type":"number","name":"age","label":"Idade","required":true,"min":18,"max":100,"section":"page2","style":"input-style"},{"type":"textarea","name":"bio","label":"Biografia","required":true,"minlength":10,"maxlength":500,"section":"page3","style":"input-style"},{"type":"select","name":"gender","label":"Gênero","options":[{"value":"male","label":"Masculino"},{"value":"female","label":"Feminino"},{"value":"other","label":"Outro"}],"section":"page3","style":"input-style"},{"type":"submit","value":"Enviar","section":"page3","style":"input-style"}]});
+    static validatePage(page, formConfig) {
+        const fields = formConfig.fields.filter(field => field.section === `page${page}` && field.required);
+        for (const field of fields) {
+            const element = document.querySelector(`[name="${field.name}"]`);
+            if (element && !element.value) {
+                alert(`Por favor, preencha o campo obrigatório: ${field.label}`);
+                return false;
+            }
+        }
+        return true;
+    }
+})({"formId":"meuFormulario","method":"POST","action":"/submit","styles":{"form":"border: 1px solid #ccc; padding: 20px;","field":"margin-bottom: 10px;","label":"font-weight: bold;","input":"padding: 5px; width: 100%;"},"fields":[{"type":"text","name":"username","label":"Nome de Usuário","required":true,"pattern":"^[a-zA-Z0-9_]{1,15}$","section":"page1","style":"input-style"},{"type":"password","name":"password","label":"Senha","required":true,"minlength":6,"section":"page1","style":"input-style"},{"type":"email","name":"email","label":"Email","required":true,"section":"page2","style":"input-style"},{"type":"number","name":"age","label":"Idade","required":true,"min":18,"max":100,"section":"page2","style":"input-style"},{"type":"textarea","name":"bio","label":"Biografia","required":true,"minlength":10,"maxlength":500,"section":"page3","style":"input-style"},{"type":"select","name":"gender","label":"Gênero","options":[{"value":"male","label":"Masculino"},{"value":"female","label":"Feminino"},{"value":"other","label":"Outro"}],"required":true,"section":"page3","style":"input-style"},{"type":"submit","value":"Enviar","section":"page3","style":"input-style"}]});
         return formGenerator.generateForm(page);
       }
     </script>
   </head>
   <body>
     <div id="formContainer">
-      <form id="meuFormulario" method="POST" action="/submit" style="border: 1px solid #ccc; padding: 20px;">
+      <form id="meuFormulario" method="POST" action="/submit" style="border: 1px solid #ccc; padding: 20px;" onsubmit="return false;">
 <div style="margin-bottom: 10px;">
 <label style="font-weight: bold;">Nome de Usuário</label>
 <input type="text" name="username" placeholder="Nome de Usuário" style="padding: 5px; width: 100%;" required pattern="^[a-zA-Z0-9_]{1,15}$"    >
@@ -112,7 +142,7 @@
 <label style="font-weight: bold;">Senha</label>
 <input type="password" name="password" placeholder="Senha" style="padding: 5px; width: 100%;" required  minlength="6"   >
 </div>
-<div style="text-align: center; margin-top: 20px;"><button type="button" onclick="navigateTo(2)">Próximo</button></div></form>
+<div style="text-align: center; margin-top: 20px;"><button type="button" onclick="validateAndNavigate(2)">Próximo</button></div></form>
 
     </div>
   </body>

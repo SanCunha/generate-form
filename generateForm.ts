@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import { FormGenerator } from './FormGenerator';
 import { FormConfig } from './FieldConfig';
 
+// Exemplo de uso
 const formConfig: FormConfig = {
   formId: "meuFormulario",
   method: "POST",
@@ -68,6 +69,7 @@ const formConfig: FormConfig = {
         { value: "female", label: "Feminino" },
         { value: "other", label: "Outro" }
       ],
+      required: true,
       section: "page3",
       style: "input-style"
     },
@@ -98,6 +100,25 @@ const generateAndSaveForm = (page: number) => {
       function navigateTo(page) {
         currentPage = page;
         document.getElementById('formContainer').innerHTML = generateForm(currentPage);
+      }
+
+      function validateAndNavigate(page) {
+        const isValid = validatePage(currentPage);
+        if (isValid) {
+          navigateTo(page);
+        }
+      }
+
+      function validatePage(page) {
+        const fields = ${JSON.stringify(formConfig.fields)}.filter(field => field.section === \`page\${page}\` && field.required);
+        for (const field of fields) {
+          const element = document.querySelector(\`[name="\${field.name}"]\`);
+          if (element && !element.value) {
+            alert(\`Por favor, preencha o campo obrigatório: \${field.label}\`);
+            return false;
+          }
+        }
+        return true;
       }
 
       function generateForm(page) {
