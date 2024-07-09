@@ -1,0 +1,106 @@
+
+  <!DOCTYPE html>
+  <html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulário Gerado</title>
+    <script>
+      let currentPage = 1;
+      const totalPages = 3;
+
+      function navigateTo(page) {
+        currentPage = page;
+        document.getElementById('formContainer').innerHTML = generateForm(currentPage);
+      }
+
+      function generateForm(page) {
+        const formGenerator = new (class FormGenerator {
+    constructor(config) {
+        this.config = config;
+        this.currentPage = 1;
+        this.totalPages = this.calculateTotalPages();
+    }
+    calculateTotalPages() {
+        const sections = new Set(this.config.fields.map(field => field.section));
+        return sections.size;
+    }
+    generateForm(currentPage) {
+        var _a;
+        this.currentPage = currentPage;
+        const styles = this.config.styles;
+        let formHTML = `<form id="${this.config.formId}" method="${this.config.method}" action="${this.config.action}" style="${(_a = styles === null || styles === void 0 ? void 0 : styles.form) !== null && _a !== void 0 ? _a : ''}">\n`;
+        this.config.fields.forEach(field => {
+            if (field.section === `page${this.currentPage}`) {
+                formHTML += this.createField(field, styles);
+            }
+        });
+        formHTML += this.createNavigationButtons();
+        formHTML += '</form>\n';
+        return formHTML;
+    }
+    createField(field, styles) {
+        var _a, _b, _c, _d;
+        let fieldHTML = '';
+        const fieldStyle = (_a = styles === null || styles === void 0 ? void 0 : styles.field) !== null && _a !== void 0 ? _a : '';
+        const labelStyle = (_b = styles === null || styles === void 0 ? void 0 : styles.label) !== null && _b !== void 0 ? _b : '';
+        const inputStyle = (_c = styles === null || styles === void 0 ? void 0 : styles.input) !== null && _c !== void 0 ? _c : '';
+        switch (field.type) {
+            case 'text':
+            case 'password':
+            case 'email':
+            case 'number':
+                fieldHTML += `<div style="${fieldStyle}">\n<label style="${labelStyle}">${field.label}</label>\n<input type="${field.type}" name="${field.name}" placeholder="${field.label}" style="${inputStyle}" ${field.required ? 'required' : ''} ${field.pattern ? `pattern="${field.pattern}"` : ''} ${field.minlength ? `minlength="${field.minlength}"` : ''} ${field.maxlength ? `maxlength="${field.maxlength}"` : ''} ${field.min ? `min="${field.min}"` : ''} ${field.max ? `max="${field.max}"` : ''}>\n</div>\n`;
+                break;
+            case 'submit':
+                fieldHTML += `<div style="${fieldStyle}">\n<input type="submit" value="${field.value}" style="${inputStyle}" ${this.currentPage !== this.totalPages ? 'disabled' : ''}>\n</div>\n`;
+                break;
+            case 'textarea':
+                fieldHTML += `<div style="${fieldStyle}">\n<label style="${labelStyle}">${field.label}</label>\n<textarea name="${field.name}" placeholder="${field.label}" style="${inputStyle}" ${field.required ? 'required' : ''} ${field.minlength ? `minlength="${field.minlength}"` : ''} ${field.maxlength ? `maxlength="${field.maxlength}"` : ''}></textarea>\n</div>\n`;
+                break;
+            case 'select':
+                fieldHTML += `<div style="${fieldStyle}">\n<label style="${labelStyle}">${field.label}</label>\n<select name="${field.name}" style="${inputStyle}">\n`;
+                (_d = field.options) === null || _d === void 0 ? void 0 : _d.forEach(option => {
+                    fieldHTML += `<option value="${option.value}">${option.label}</option>\n`;
+                });
+                fieldHTML += '</select>\n</div>\n';
+                break;
+            default:
+                console.warn(`Tipo de campo desconhecido: ${field.type}`);
+                return '';
+        }
+        return fieldHTML;
+    }
+    createNavigationButtons() {
+        let buttonsHTML = '<div style="text-align: center; margin-top: 20px;">';
+        if (this.currentPage > 1) {
+            buttonsHTML += `<button type="button" onclick="navigateTo(${this.currentPage - 1})">Anterior</button>`;
+        }
+        if (this.currentPage < this.totalPages) {
+            buttonsHTML += `<button type="button" onclick="navigateTo(${this.currentPage + 1})">Próximo</button>`;
+        }
+        buttonsHTML += '</div>';
+        return buttonsHTML;
+    }
+})({"formId":"meuFormulario","method":"POST","action":"/submit","styles":{"form":"border: 1px solid #ccc; padding: 20px;","field":"margin-bottom: 10px;","label":"font-weight: bold;","input":"padding: 5px; width: 100%;"},"fields":[{"type":"text","name":"username","label":"Nome de Usuário","required":true,"pattern":"^[a-zA-Z0-9_]{1,15}$","section":"page1","style":"input-style"},{"type":"password","name":"password","label":"Senha","required":true,"minlength":6,"section":"page1","style":"input-style"},{"type":"email","name":"email","label":"Email","required":true,"section":"page2","style":"input-style"},{"type":"number","name":"age","label":"Idade","required":true,"min":18,"max":100,"section":"page2","style":"input-style"},{"type":"textarea","name":"bio","label":"Biografia","required":true,"minlength":10,"maxlength":500,"section":"page3","style":"input-style"},{"type":"select","name":"gender","label":"Gênero","options":[{"value":"male","label":"Masculino"},{"value":"female","label":"Feminino"},{"value":"other","label":"Outro"}],"section":"page3","style":"input-style"},{"type":"submit","value":"Enviar","section":"page3","style":"input-style"}]});
+        return formGenerator.generateForm(page);
+      }
+    </script>
+  </head>
+  <body>
+    <div id="formContainer">
+      <form id="meuFormulario" method="POST" action="/submit" style="border: 1px solid #ccc; padding: 20px;">
+<div style="margin-bottom: 10px;">
+<label style="font-weight: bold;">Nome de Usuário</label>
+<input type="text" name="username" placeholder="Nome de Usuário" style="padding: 5px; width: 100%;" required pattern="^[a-zA-Z0-9_]{1,15}$"    >
+</div>
+<div style="margin-bottom: 10px;">
+<label style="font-weight: bold;">Senha</label>
+<input type="password" name="password" placeholder="Senha" style="padding: 5px; width: 100%;" required  minlength="6"   >
+</div>
+<div style="text-align: center; margin-top: 20px;"><button type="button" onclick="navigateTo(2)">Próximo</button></div></form>
+
+    </div>
+  </body>
+  </html>
+  
