@@ -18,7 +18,7 @@ Este projeto é um gerador de formulários em HTML usando TypeScript. Ele permit
 
 1. Clone o repositório:
    ```bash
-   git clone https://github.com/usuario/form-generator.git
+   git clone https://github.com/SanCunha/generate-form.git
    cd form-generator
 2. Instale as dependências do projeto:
    ```bash
