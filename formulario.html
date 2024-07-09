@@ -40,7 +40,7 @@
         return formHTML;
     }
     createField(field, styles) {
-        var _a, _b, _c, _d;
+        var _a, _b, _c;
         let fieldHTML = '';
         const fieldStyle = (_a = styles === null || styles === void 0 ? void 0 : styles.field) !== null && _a !== void 0 ? _a : '';
         const labelStyle = (_b = styles === null || styles === void 0 ? void 0 : styles.label) !== null && _b !== void 0 ? _b : '';
@@ -50,25 +50,39 @@
             case 'password':
             case 'email':
             case 'number':
-                fieldHTML += `<div style="${fieldStyle}">\n<label style="${labelStyle}">${field.label}</label>\n<input type="${field.type}" name="${field.name}" placeholder="${field.label}" style="${inputStyle}" ${field.required ? 'required' : ''} ${field.pattern ? `pattern="${field.pattern}"` : ''} ${field.minlength ? `minlength="${field.minlength}"` : ''} ${field.maxlength ? `maxlength="${field.maxlength}"` : ''} ${field.min ? `min="${field.min}"` : ''} ${field.max ? `max="${field.max}"` : ''}>\n</div>\n`;
+                fieldHTML += this.createInputField(field, fieldStyle, labelStyle, inputStyle);
                 break;
             case 'submit':
-                fieldHTML += `<div style="${fieldStyle}">\n<input type="submit" value="${field.value}" style="${inputStyle}" ${this.currentPage !== this.totalPages ? 'disabled' : ''}>\n</div>\n`;
+                fieldHTML += this.createSubmitField(field, fieldStyle, inputStyle);
                 break;
             case 'textarea':
-                fieldHTML += `<div style="${fieldStyle}">\n<label style="${labelStyle}">${field.label}</label>\n<textarea name="${field.name}" placeholder="${field.label}" style="${inputStyle}" ${field.required ? 'required' : ''} ${field.minlength ? `minlength="${field.minlength}"` : ''} ${field.maxlength ? `maxlength="${field.maxlength}"` : ''}></textarea>\n</div>\n`;
+                fieldHTML += this.createTextareaField(field, fieldStyle, labelStyle, inputStyle);
                 break;
             case 'select':
-                fieldHTML += `<div style="${fieldStyle}">\n<label style="${labelStyle}">${field.label}</label>\n<select name="${field.name}" style="${inputStyle}">\n`;
-                (_d = field.options) === null || _d === void 0 ? void 0 : _d.forEach(option => {
-                    fieldHTML += `<option value="${option.value}">${option.label}</option>\n`;
-                });
-                fieldHTML += '</select>\n</div>\n';
+                fieldHTML += this.createSelectField(field, fieldStyle, labelStyle, inputStyle);
                 break;
             default:
                 console.warn(`Tipo de campo desconhecido: ${field.type}`);
                 return '';
         }
+        return fieldHTML;
+    }
+    createInputField(field, fieldStyle, labelStyle, inputStyle) {
+        return `<div style="${fieldStyle}">\n<label style="${labelStyle}">${field.label}</label>\n<input type="${field.type}" name="${field.name}" placeholder="${field.label}" style="${inputStyle}" ${field.required ? 'required' : ''} ${field.pattern ? `pattern="${field.pattern}"` : ''} ${field.minlength ? `minlength="${field.minlength}"` : ''} ${field.maxlength ? `maxlength="${field.maxlength}"` : ''} ${field.min ? `min="${field.min}"` : ''} ${field.max ? `max="${field.max}"` : ''}>\n</div>\n`;
+    }
+    createSubmitField(field, fieldStyle, inputStyle) {
+        return `<div style="${fieldStyle}">\n<input type="submit" value="${field.value}" style="${inputStyle}" ${this.currentPage !== this.totalPages ? 'disabled' : ''}>\n</div>\n`;
+    }
+    createTextareaField(field, fieldStyle, labelStyle, inputStyle) {
+        return `<div style="${fieldStyle}">\n<label style="${labelStyle}">${field.label}</label>\n<textarea name="${field.name}" placeholder="${field.label}" style="${inputStyle}" ${field.required ? 'required' : ''} ${field.minlength ? `minlength="${field.minlength}"` : ''} ${field.maxlength ? `maxlength="${field.maxlength}"` : ''}></textarea>\n</div>\n`;
+    }
+    createSelectField(field, fieldStyle, labelStyle, inputStyle) {
+        var _a;
+        let fieldHTML = `<div style="${fieldStyle}">\n<label style="${labelStyle}">${field.label}</label>\n<select name="${field.name}" style="${inputStyle}">\n`;
+        (_a = field.options) === null || _a === void 0 ? void 0 : _a.forEach(option => {
+            fieldHTML += `<option value="${option.value}">${option.label}</option>\n`;
+        });
+        fieldHTML += '</select>\n</div>\n';
         return fieldHTML;
     }
     createNavigationButtons() {

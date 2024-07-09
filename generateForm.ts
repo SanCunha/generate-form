@@ -1,125 +1,7 @@
 import * as fs from 'fs';
+import { FormGenerator } from './FormGenerator';
+import { FormConfig } from './FieldConfig';
 
-interface FieldConfig {
-  type: string;
-  name?: string;
-  label?: string;
-  value?: string;
-  required?: boolean;
-  pattern?: string;
-  minlength?: number;
-  maxlength?: number;
-  min?: number;
-  max?: number;
-  options?: { value: string; label: string }[];
-  style?: string;
-  section?: string;
-}
-
-interface StylesConfig {
-  form?: string;
-  field?: string;
-  label?: string;
-  input?: string;
-}
-
-interface FormConfig {
-  formId: string;
-  method: string;
-  action: string;
-  styles?: StylesConfig;
-  fields: FieldConfig[];
-}
-
-class FormGenerator {
-  config: FormConfig;
-  currentPage: number;
-  totalPages: number;
-
-  constructor(config: FormConfig) {
-    this.config = config;
-    this.currentPage = 1;
-    this.totalPages = this.calculateTotalPages();
-  }
-
-  calculateTotalPages(): number {
-    const sections = new Set(this.config.fields.map(field => field.section));
-    return sections.size;
-  }
-
-  generateForm(currentPage: number): string {
-    this.currentPage = currentPage;
-    const styles = this.config.styles;
-    let formHTML = `<form id="${this.config.formId}" method="${this.config.method}" action="${this.config.action}" style="${styles?.form ?? ''}">\n`;
-
-    this.config.fields.forEach(field => {
-      if (field.section === `page${this.currentPage}`) {
-        formHTML += this.createField(field, styles);
-      }
-    });
-
-    formHTML += this.createNavigationButtons();
-    formHTML += '</form>\n';
-    return formHTML;
-  }
-
-  createField(field: FieldConfig, styles?: StylesConfig): string {
-    let fieldHTML = '';
-    const fieldStyle = styles?.field ?? '';
-    const labelStyle = styles?.label ?? '';
-    const inputStyle = styles?.input ?? '';
-
-    switch (field.type) {
-      case 'text':
-      case 'password':
-      case 'email':
-      case 'number':
-        fieldHTML += `<div style="${fieldStyle}">\n<label style="${labelStyle}">${field.label}</label>\n<input type="${field.type}" name="${field.name}" placeholder="${field.label}" style="${inputStyle}" ${field.required ? 'required' : ''} ${field.pattern ? `pattern="${field.pattern}"` : ''} ${field.minlength ? `minlength="${field.minlength}"` : ''} ${field.maxlength ? `maxlength="${field.maxlength}"` : ''} ${field.min ? `min="${field.min}"` : ''} ${field.max ? `max="${field.max}"` : ''}>\n</div>\n`;
-        break;
-
-      case 'submit':
-        fieldHTML += `<div style="${fieldStyle}">\n<input type="submit" value="${field.value}" style="${inputStyle}" ${this.currentPage !== this.totalPages ? 'disabled' : ''}>\n</div>\n`;
-        break;
-
-      case 'textarea':
-        fieldHTML += `<div style="${fieldStyle}">\n<label style="${labelStyle}">${field.label}</label>\n<textarea name="${field.name}" placeholder="${field.label}" style="${inputStyle}" ${field.required ? 'required' : ''} ${field.minlength ? `minlength="${field.minlength}"` : ''} ${field.maxlength ? `maxlength="${field.maxlength}"` : ''}></textarea>\n</div>\n`;
-        break;
-
-      case 'select':
-        fieldHTML += `<div style="${fieldStyle}">\n<label style="${labelStyle}">${field.label}</label>\n<select name="${field.name}" style="${inputStyle}">\n`;
-
-        field.options?.forEach(option => {
-          fieldHTML += `<option value="${option.value}">${option.label}</option>\n`;
-        });
-
-        fieldHTML += '</select>\n</div>\n';
-        break;
-
-      default:
-        console.warn(`Tipo de campo desconhecido: ${field.type}`);
-        return '';
-    }
-
-    return fieldHTML;
-  }
-
-  createNavigationButtons(): string {
-    let buttonsHTML = '<div style="text-align: center; margin-top: 20px;">';
-
-    if (this.currentPage > 1) {
-      buttonsHTML += `<button type="button" onclick="navigateTo(${this.currentPage - 1})">Anterior</button>`;
-    }
-
-    if (this.currentPage < this.totalPages) {
-      buttonsHTML += `<button type="button" onclick="navigateTo(${this.currentPage + 1})">Próximo</button>`;
-    }
-
-    buttonsHTML += '</div>';
-    return buttonsHTML;
-  }
-}
-
-// Exemplo de uso
 const formConfig: FormConfig = {
   formId: "meuFormulario",
   method: "POST",
@@ -199,7 +81,6 @@ const formConfig: FormConfig = {
 };
 
 const formGenerator = new FormGenerator(formConfig);
-let currentPage = 1;
 
 const generateAndSaveForm = (page: number) => {
   const formHTML = formGenerator.generateForm(page);
@@ -236,4 +117,4 @@ const generateAndSaveForm = (page: number) => {
   fs.writeFileSync('formulario.html', htmlContent);
 };
 
-generateAndSaveForm(currentPage);
+generateAndSaveForm(1);
